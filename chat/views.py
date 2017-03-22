@@ -9,7 +9,11 @@ from django.views.generic import View
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from chat.models import Group, UserGroup, Post
 
+
+def home(request):
+    return TemplateResponse(request, 'home.html')
 
 class SignUp(View):
 
@@ -39,4 +43,20 @@ class ListGroups(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        pass
+        public_groups = Group.objects.filter(visibility=True).exclude(members__pk=request.user.pk)
+        user_groups = Group.objects.filter(members__pk=request.user.pk)
+        context = {'public_groups': public_groups, 'user_groups': user_groups}
+        return TemplateResponse(request, 'groups/list.html', context)
+
+@login_required
+def join_group(request, group_id):
+    group = Group.objects.get(pk=group_id)
+    userGroup, created = UserGroup.objects.get_or_create(
+        user=request.user,
+        group=group
+    )
+    msg_level = messages.SUCCESS if created else messages.WARNING
+    msg = _('Congrats! You have joined the group %s.' % group.name) if created \
+        else _('You are already in group %s.' % group.name)
+    messages.add_message(request, msg_level, msg)
+    return HttpResponseRedirect(reverse('list_groups'))

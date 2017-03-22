@@ -122,9 +122,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/chat/groups'
 
-DJANGO_BOOTSTRAP_UI_THEME = 'bootswatch-superhero'
+DJANGO_BOOTSTRAP_UI_THEME = 'bootswatch-yeti'
 
 # Overriding ERROR message level to be compatible with bootstrap level
 from django.contrib.messages import constants as messages

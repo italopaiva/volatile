@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load bootstrap_ui_tags %}
+
+{% block page-content %}
+{{ block.super }}
+
+{% row %}
+  <h1 class="text-center"> {% trans 'Your groups' %}</h1>
+{% endrow %}
+
+{% row %}
+  {% for group in user_groups %}
+    {% column md="4" %}
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+        </div>
+        <div class="panel-body">
+
+        </div>
+        <div class="panel-footer">
+          <a class="btn btn-primary btn-flat" href="">
+            <i class="fa fa-sign-in"></i> {% trans 'Enter' %}
+          </a>
+        </div>
+      </div>
+    {% endcolumn %}
+  {% empty %}
+    {% trans 'You haven\'t joined no groups yet.' %}
+  {% endfor %}
+{% endrow %}
+
+<br>
+<br>
+{% row %}
+  <h1 class="text-center"> {% trans 'Public groups you do not belong' %}</h1>
+{% endrow %}
+
+{% row %}
+  {% for group in public_groups %}
+    {% column md="4" %}
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+        </div>
+        <div class="panel-body">
+
+        </div>
+        <div class="panel-footer">
+          <a class="btn btn-primary btn-block" href="{% url 'join_group' group.pk %}">
+            <i class="fa fa-plus-square"></i> {% trans 'Join' %}
+          </a>
+        </div>
+      </div>
+    {% endcolumn %}
+  {% endfor %}
+{% endrow %}
+
+
+{% endblock %}

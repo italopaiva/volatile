@@ -20,10 +20,11 @@ from django.views.generic import RedirectView
 from chat import views as chat_views
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='login'), name='home'),
+    url(r'^$', RedirectView.as_view(url='home'), name='initial'),
     url(r'^admin/', admin.site.urls),
-    url(r'^login', auth_views.login, {'template_name': 'home.html'}, 'login'),
+    url(r'^login', auth_views.login, {'template_name': 'login.html'}, 'login'),
     url(r'^logout', auth_views.logout, {'next_page': 'home'}, 'logout'),
     url(r'^signup', chat_views.SignUp.as_view(), name='signup'),
+    url(r'^home', chat_views.home, name='home'),
     url(r'^chat/', include('chat.urls')),
 ]
