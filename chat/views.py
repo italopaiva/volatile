@@ -48,10 +48,25 @@ class ListGroups(View):
         context = {'public_groups': public_groups, 'user_groups': user_groups}
         return TemplateResponse(request, 'groups/list.html', context)
 
+
+class GroupChat(View):
+
+    @method_decorator(login_required)
+    def get(self, request, group_id):
+        group = Group.objects.get(pk=group_id)
+        user_group = UserGroup.objects.get(group=group)
+        posts = Post.objects.filter(group=user_group)
+        context = {
+            'posts': posts,
+            'group': group
+        }
+        return TemplateResponse(request, 'posts/list.html', context)
+
+
 @login_required
 def join_group(request, group_id):
     group = Group.objects.get(pk=group_id)
-    userGroup, created = UserGroup.objects.get_or_create(
+    user_group, created = UserGroup.objects.get_or_create(
         user=request.user,
         group=group
     )
@@ -59,4 +74,4 @@ def join_group(request, group_id):
     msg = _('Congrats! You have joined the group %s.' % group.name) if created \
         else _('You are already in group %s.' % group.name)
     messages.add_message(request, msg_level, msg)
-    return HttpResponseRedirect(reverse('list_groups'))
+    return HttpResponseRedirect(reverse('group_chat'))

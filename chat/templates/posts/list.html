@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load bootstrap_ui_tags %}
+
+{% block page-content %}
+{{ block.super }}
+
+{% row %}
+  <h1 class="text-center"> {% trans 'Posts of group' %} <b>{{ group.name }}</b></h1>
+{% endrow %}
+<br>
+
+{% row %}
+  {% column md="8" md_offset="2" %}
+    {% for post in posts %}
+      <h3><strong>@{{ post.group.user.username }}</strong> <i>said</i>:
+        <br><small>{% trans 'At' %} {{ post.time }}</small>
+      </h3>
+      <p style="text-indent: 5%; word-wrap: break-word;"
+         class="text-left">
+         {{ post.content }}
+      </p>
+      <hr>
+    {% empty %}
+      {% trans 'There are no posts in this group yet' %}.
+    {% endfor %}
+  {% endcolumn %}
+{% endrow %}
+
+{% endblock %}
