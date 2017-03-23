@@ -40,6 +40,7 @@ class SignUp(View):
 
         return response
 
+
 class ListGroups(View):
 
     @method_decorator(login_required)
@@ -57,8 +58,7 @@ class GroupChat(View):
     @method_decorator(login_required)
     def get(self, request, group_id):
         group = Group.objects.get(pk=group_id)
-        user_group = UserGroup.objects.get(group=group)
-        posts = Post.objects.filter(group=user_group).order_by('-time')
+        posts = Post.objects.filter(group=group).order_by('-time')
         context = {
             'posts': posts,
             'group': group,
@@ -69,18 +69,35 @@ class GroupChat(View):
     @method_decorator(login_required)
     def post(self, request, group_id):
         group = Group.objects.get(pk=group_id)
-        user_group = UserGroup.objects.get(group=group, user=request.user)
-        post = Post(group=user_group)
+        post = Post(group=group, user=request.user)
         form = self.form(data=request.POST, instance=post)
         if form.is_valid():
             form.save()
             msg_level = messages.SUCCESS
             msg = _('Your post was saved successfully!')
         else:
-            msg_level = messages.DANGER
+            msg_level = messages.ERROR
             msg = _('Your post has some errors, check it out!')
         messages.add_message(request, msg_level, msg)
         return HttpResponseRedirect(reverse('group_chat', kwargs={'group_id': group_id}))
+
+
+@login_required
+def delete_post(request, post_id):
+    post = Post.objects.get(pk=post_id)
+    if(post.user == request.user):
+        post.delete()
+        msg_level = messages.SUCCESS
+        msg = _('Post deleted with success!')
+    else:
+        msg_level = messages.ERROR
+        msg = _('You cannot delete somebody else\'s post!')
+    messages.add_message(request, msg_level, msg)
+    return HttpResponseRedirect(reverse(
+        'group_chat',
+        kwargs={'group_id': post.group.pk}
+    ))
+
 
 @login_required
 def join_group(request, group_id):
@@ -93,4 +110,4 @@ def join_group(request, group_id):
     msg = _('Congrats! You have joined the group %s.' % group.name) if created \
         else _('You are already in group %s.' % group.name)
     messages.add_message(request, msg_level, msg)
-    return HttpResponseRedirect(reverse('group_chat'))
+    return HttpResponseRedirect(reverse('group_chat', kwargs={'group_id': group_id}))

@@ -14,8 +14,8 @@
 {% row %}
   {% column md="8" md_offset="2" %}
     <form method="post" action="{% url 'group_chat' group.pk %}">
+      {% csrf_token %}
       <div class="panel panel-default">
-        {% csrf_token %}
         <div class="panel-body">
           {% bootstrap_field post_form.content show_label=False placeholder='Tell us what you are thinking...' %}
 
@@ -31,9 +31,23 @@
 {% row %}
   {% column md="8" md_offset="2" %}
     {% for post in posts %}
-      <h3><strong>@{{ post.group.user.username }}</strong> <i>said</i>:
-        <br><small>{% trans 'At' %} {{ post.time }}</small>
-      </h3>
+
+      {% row %}
+        {% column md="8" %}
+          <h3><strong>@{{ post.user.username }}</strong> <i>said</i>:
+            <br><small>{% trans 'At' %} {{ post.time }}</small>
+          </h3>
+        {% endcolumn %}
+        {% column md="4" %}
+
+          {% if post.user == user %}
+            <form method="post" action="{% url 'erase_post' post.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+            </form>
+          {% endif %}
+        {% endcolumn %}
+      {% endrow %}
       <p style="text-indent: 5%; word-wrap: break-word;"
          class="text-left">
          {{ post.content }}
