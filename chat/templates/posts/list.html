@@ -13,6 +13,23 @@
 
 {% row %}
   {% column md="8" md_offset="2" %}
+    <form method="post" action="{% url 'group_chat' group.pk %}">
+      <div class="panel panel-default">
+        {% csrf_token %}
+        <div class="panel-body">
+          {% bootstrap_field post_form.content show_label=False placeholder='Tell us what you are thinking...' %}
+
+          <button class="btn btn-success btn-md btn-flat pull-right">
+            <i class="fa fa-send"></i> {% trans 'Post' %}
+          </button>
+        </div>
+      </div>
+    </form>
+  {% endcolumn %}
+{% endrow %}
+
+{% row %}
+  {% column md="8" md_offset="2" %}
     {% for post in posts %}
       <h3><strong>@{{ post.group.user.username }}</strong> <i>said</i>:
         <br><small>{% trans 'At' %} {{ post.time }}</small>
@@ -29,3 +46,4 @@
 {% endrow %}
 
 {% endblock %}
+

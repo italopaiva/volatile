@@ -10,6 +10,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from chat.models import Group, UserGroup, Post
+from chat.forms import NewPostForm
 
 
 def home(request):
@@ -51,17 +52,35 @@ class ListGroups(View):
 
 class GroupChat(View):
 
+    form = NewPostForm
+
     @method_decorator(login_required)
     def get(self, request, group_id):
         group = Group.objects.get(pk=group_id)
         user_group = UserGroup.objects.get(group=group)
-        posts = Post.objects.filter(group=user_group)
+        posts = Post.objects.filter(group=user_group).order_by('-time')
         context = {
             'posts': posts,
-            'group': group
+            'group': group,
+            'post_form': self.form(),
         }
         return TemplateResponse(request, 'posts/list.html', context)
 
+    @method_decorator(login_required)
+    def post(self, request, group_id):
+        group = Group.objects.get(pk=group_id)
+        user_group = UserGroup.objects.get(group=group, user=request.user)
+        post = Post(group=user_group)
+        form = self.form(data=request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            msg_level = messages.SUCCESS
+            msg = _('Your post was saved successfully!')
+        else:
+            msg_level = messages.DANGER
+            msg = _('Your post has some errors, check it out!')
+        messages.add_message(request, msg_level, msg)
+        return HttpResponseRedirect(reverse('group_chat', kwargs={'group_id': group_id}))
 
 @login_required
 def join_group(request, group_id):

@@ -2,6 +2,7 @@ from django import forms
 from django.core import validators
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext, ugettext_lazy as _
+from chat.models import Post
 
 class NewUserForm(forms.ModelForm):
 
@@ -15,3 +16,9 @@ class NewUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username']
+
+
+class NewPostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['content']
