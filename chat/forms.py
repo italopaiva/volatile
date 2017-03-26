@@ -2,7 +2,7 @@ from django import forms
 from django.core import validators
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from chat.models import Post
+from chat.models import Post, Group
 
 
 class NewUserForm(forms.ModelForm):
@@ -27,3 +27,9 @@ class NewPostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['content']
+
+
+class NewGroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        fields = ['visibility', 'name']

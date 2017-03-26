@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from chat.models import Group, UserGroup, Post
-from chat.forms import NewPostForm
+from chat.forms import NewPostForm, NewGroupForm
 
 
 def home(request):
@@ -57,7 +57,11 @@ class ListGroups(View):
             .filter(visibility=True) \
             .exclude(members__pk=request.user.pk)
         user_groups = Group.objects.filter(members__pk=request.user.pk)
-        context = {'public_groups': public_groups, 'user_groups': user_groups}
+        context = {
+            'public_groups': public_groups,
+            'user_groups': user_groups,
+            'new_group_form': NewGroupForm()
+        }
         return TemplateResponse(request, 'groups/list.html', context)
 
 
@@ -96,6 +100,24 @@ class GroupChat(View):
             kwargs={'group_id': group_id}
         ))
 
+
+class GroupView(View):
+
+    form = NewGroupForm
+
+    @method_decorator(login_required)
+    def post(self, request):
+        group = Group(owner=request.user)
+        form = self.form(data=request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            msg_level = messages.SUCCESS
+            msg = _('Your group was created!')
+        else:
+            msg_level = messages.ERROR
+            msg = _('Couldn\'t create this group, check it out!')
+        messages.add_message(request, msg_level, msg)
+        return HttpResponseRedirect(reverse('list_groups'))
 
 @login_required
 def delete_post(request, post_id):

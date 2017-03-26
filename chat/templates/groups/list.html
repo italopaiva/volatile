@@ -7,7 +7,14 @@
 {{ block.super }}
 
 {% row %}
-  <h1 class="text-center"> {% trans 'Your groups' %}</h1>
+  <button type="button" class="btn btn-default btn-lg pull-right"
+          data-toggle="modal" data-target="#new_group_form">
+    <i class="fa fa-plus-circle"></i> {% trans 'Create a Group' %}
+  </button>
+{% endrow %}
+
+{% row %}
+  <h1 class="text-center"> {% trans 'Groups you are participating' %}</h1>
 {% endrow %}
 
 {% row %}
@@ -49,14 +56,17 @@
 
         </div>
         <div class="panel-footer">
-          <a class="btn btn-primary btn-block" href="{% url 'join_group' group.pk %}">
+          <a class="btn btn-warning btn-block" href="{% url 'join_group' group.pk %}">
             <i class="fa fa-plus-square"></i> {% trans 'Join' %}
           </a>
         </div>
       </div>
     {% endcolumn %}
+  {% empty %}
+    {% trans 'No more public groups available.' %}
   {% endfor %}
 {% endrow %}
 
+{% include "groups/new.html" with form=new_group_form %}
 
 {% endblock %}

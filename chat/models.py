@@ -1,11 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 
 class Group(models.Model):
-    visibility = models.BooleanField(default=True)
-    name = models.CharField(max_length=50)
-    members = models.ManyToManyField(User, through='UserGroup')
+    owner = models.ForeignKey(
+        User,
+        related_name='owner',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    members = models.ManyToManyField(
+        User,
+        related_name='members',
+        through='UserGroup'
+    )
+    visibility = models.BooleanField(_('Public group'), default=True)
+    name = models.CharField(_('Group name'), max_length=50)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
