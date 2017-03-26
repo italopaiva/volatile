@@ -109,6 +109,7 @@ class GroupView(View):
 
     @method_decorator(login_required)
     def post(self, request):
+        """ Creates a new group """
         group = Group(owner=request.user)
         form = self.form(data=request.POST, instance=group)
         if form.is_valid():
@@ -120,6 +121,21 @@ class GroupView(View):
             msg = _('Couldn\'t create this group, check it out!')
         messages.add_message(request, msg_level, msg)
         return HttpResponseRedirect(reverse('list_groups'))
+
+@login_required
+def delete_group(request, group_id):
+    """ Delete a group if the current user owns it """
+    group = Group.objects.get(pk=group_id)
+    if group.owner == request.user:
+        group.delete()
+        msg_level = messages.SUCCESS
+        msg = _('Your group was deleted!')
+    else:
+        msg_level = messages.ERROR
+        msg = _('You cannot delete somebody else\'s group!')
+    messages.add_message(request, msg_level, msg)
+    return HttpResponseRedirect(reverse('list_groups'))
+
 
 @login_required
 def delete_post(request, post_id):

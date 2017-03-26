@@ -24,7 +24,13 @@
         {% column md="12" %}
           <div class="panel panel-danger">
             <div class="panel-heading">
-              <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+              <h3 class="panel-title text-center"><b>{{ group.name }}</b>
+                {% if group.owner == user %}
+                  <a href="{% url 'delete_group' group.pk %}" class="pull-right">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                {% endif %}
+              </h3>
             </div>
             <div class="panel-body">
 
@@ -53,7 +59,14 @@
         {% column md="4" %}
           <div class="panel panel-success">
             <div class="panel-heading">
-              <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+              <h3 class="panel-title text-center">
+                <b>{{ group.name }}</b>
+                {% if group.owner == user %}
+                  <a href="{% url 'delete_group' group.pk %}" class="pull-right">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                {% endif %}
+              </h3>
             </div>
             <div class="panel-body">
 
@@ -83,7 +96,13 @@
     {% column md="4" %}
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+          <h3 class="panel-title text-center"><b>{{ group.name }}</b>
+            {% if group.owner == user %}
+              <a href="{% url 'delete_group' group.pk %}" class="pull-right">
+                <i class="fa fa-trash"></i>
+              </a>
+            {% endif %}
+          </h3>
         </div>
         <div class="panel-body">
 
