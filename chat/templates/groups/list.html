@@ -14,29 +14,62 @@
 {% endrow %}
 
 {% row %}
-  <h1 class="text-center"> {% trans 'Groups you are participating' %}</h1>
-{% endrow %}
+  {% column md="4" %}
+    {% row %}
+      <h1 class="text-center"> {% trans 'Your private groups' %}</h1>
+    {% endrow %}
 
-{% row %}
-  {% for group in user_groups %}
-    {% column md="4" %}
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
-        </div>
-        <div class="panel-body">
+    {% row %}
+      {% for group in private_groups %}
+        {% column md="12" %}
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+            </div>
+            <div class="panel-body">
 
-        </div>
-        <div class="panel-footer">
-          <a class="btn btn-primary btn-block" href="{% url 'group_chat' group.pk %}">
-            <i class="fa fa-sign-in"></i> {% trans 'Enter' %}
-          </a>
-        </div>
-      </div>
-    {% endcolumn %}
-  {% empty %}
-    {% trans 'You haven\'t joined no groups yet.' %}
-  {% endfor %}
+            </div>
+            <div class="panel-footer">
+              <a class="btn btn-primary btn-block" href="{% url 'group_chat' group.pk %}">
+                <i class="fa fa-sign-in"></i> {% trans 'Enter' %}
+              </a>
+            </div>
+          </div>
+        {% endcolumn %}
+      {% empty %}
+        {% trans 'You haven\'t joined no groups yet.' %}
+      {% endfor %}
+    {% endrow %}
+
+  {% endcolumn %}
+
+  {% column md="8" %}
+    {% row %}
+      <h1 class="text-center"> {% trans 'Groups you are participating' %}</h1>
+    {% endrow %}
+
+    {% row %}
+      {% for group in user_groups %}
+        {% column md="4" %}
+          <div class="panel panel-success">
+            <div class="panel-heading">
+              <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
+            </div>
+            <div class="panel-body">
+
+            </div>
+            <div class="panel-footer">
+              <a class="btn btn-primary btn-block" href="{% url 'group_chat' group.pk %}">
+                <i class="fa fa-sign-in"></i> {% trans 'Enter' %}
+              </a>
+            </div>
+          </div>
+        {% endcolumn %}
+      {% empty %}
+        {% trans 'You haven\'t joined no groups yet.' %}
+      {% endfor %}
+    {% endrow %}
+  {% endcolumn %}
 {% endrow %}
 
 <br>
@@ -48,7 +81,7 @@
 {% row %}
   {% for group in public_groups %}
     {% column md="4" %}
-      <div class="panel panel-primary">
+      <div class="panel panel-info">
         <div class="panel-heading">
           <h3 class="panel-title text-center"><b>{{ group.name }}</b></h3>
         </div>

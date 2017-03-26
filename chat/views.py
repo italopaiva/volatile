@@ -48,23 +48,6 @@ class SignUp(View):
         return response
 
 
-class ListGroups(View):
-
-    @method_decorator(login_required)
-    def get(self, request):
-        """  Get all public groups and current user groups and display """
-        public_groups = Group.objects \
-            .filter(visibility=True) \
-            .exclude(members__pk=request.user.pk)
-        user_groups = Group.objects.filter(members__pk=request.user.pk)
-        context = {
-            'public_groups': public_groups,
-            'user_groups': user_groups,
-            'new_group_form': NewGroupForm()
-        }
-        return TemplateResponse(request, 'groups/list.html', context)
-
-
 class GroupChat(View):
 
     form = NewPostForm
@@ -104,6 +87,25 @@ class GroupChat(View):
 class GroupView(View):
 
     form = NewGroupForm
+
+    @method_decorator(login_required)
+    def get(self, request):
+        """  Get all public groups and current user groups and display """
+        public_groups = Group.objects \
+            .filter(visibility=True) \
+            .exclude(members__pk=request.user.pk)
+        private_groups = Group.objects.filter(
+            visibility=False,
+            owner=request.user
+        )
+        user_groups = Group.objects.filter(members__pk=request.user.pk)
+        context = {
+            'public_groups': public_groups,
+            'private_groups': private_groups,
+            'user_groups': user_groups,
+            'new_group_form': NewGroupForm()
+        }
+        return TemplateResponse(request, 'groups/list.html', context)
 
     @method_decorator(login_required)
     def post(self, request):
