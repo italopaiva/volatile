@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load bootstrap_ui_tags %}
+
+{% block page-content %}
+{{ block.super }}
+
+<br>
+<br>
+{% row %}
+  <h1 class="text-center"> {% trans 'Private groups invitations' %}</h1>
+{% endrow %}
+
+{% row %}
+  {% for group in group_invitations %}
+    {% column md="4" %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title text-center"><b>{{ group.name }}</b>
+          </h3>
+        </div>
+        <div class="panel-body">
+        Invited by <b>@{{ group.owner.username }}</b>.
+        </div>
+        <div class="panel-footer">
+          <a class="btn btn-success btn-block" href="{% url 'accept_invitation' group.pk %}">
+            <i class="fa fa-check-square"></i> {% trans 'Accept to join' %}
+          </a>
+        </div>
+      </div>
+    {% endcolumn %}
+  {% empty %}
+    {% trans 'You have no invitations to private groups.' %}
+  {% endfor %}
+{% endrow %}
+
+{% endblock %}

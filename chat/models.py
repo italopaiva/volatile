@@ -22,19 +22,36 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
+    def is_private(self):
+        return self.visibility == False
+
 
 class UserGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
+    pending_confirmation = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('user', 'group')
 
     @classmethod
-    def add_user_to_group(cls, user, group_id):
+    def add_user_to_group(cls, user, group_id, pending_confirmation=False):
         group = Group.objects.get(pk=group_id)
-        return cls.objects.get_or_create(user=user, group=group)
+        return cls.objects.get_or_create(
+            user=user,
+            group=group,
+            pending_confirmation=pending_confirmation
+        )
+
+    @classmethod
+    def filter_pending(cls, groups, user, pending=False):
+        filtered_groups = []
+        for group in groups:
+            user_group = UserGroup.objects.get(user=user, group=group)
+            if user_group.pending_confirmation is pending:
+                filtered_groups.append(group)
+        return filtered_groups
 
 
 class Post(models.Model):

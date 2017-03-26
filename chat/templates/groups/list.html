@@ -43,7 +43,7 @@
           </div>
         {% endcolumn %}
       {% empty %}
-        {% trans 'You haven\'t joined no groups yet.' %}
+        {% trans 'You have no private groups yet.' %}
       {% endfor %}
     {% endrow %}
 
@@ -57,7 +57,7 @@
     {% row %}
       {% for group in user_groups %}
         {% column md="4" %}
-          <div class="panel panel-success">
+          <div class="panel {% if group.is_private %} panel-danger {% else %} panel-success {% endif %}">
             <div class="panel-heading">
               <h3 class="panel-title text-center">
                 <b>{{ group.name }}</b>

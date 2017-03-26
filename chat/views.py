@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.views.generic import View
 from django.utils.translation import ugettext_lazy as _
@@ -99,6 +100,11 @@ class GroupView(View):
             owner=request.user
         )
         user_groups = Group.objects.filter(members__pk=request.user.pk)
+        user_groups = UserGroup.filter_pending(
+            user_groups,
+            request.user,
+            pending=False
+        )
         context = {
             'public_groups': public_groups,
             'private_groups': private_groups,
@@ -171,3 +177,53 @@ def join_group(request, group_id):
         'group_chat',
         kwargs={'group_id': group_id}
     ))
+
+@login_required
+def invite_user_to_group(request, group_id):
+    username = request.POST['user_to_invite']
+    try:
+        user_to_invite = User.objects.get(username=username)
+        group = Group.objects.get(pk=group_id)
+        if user_to_invite != group.owner:
+            user_group, created = UserGroup.add_user_to_group(
+                user_to_invite,
+                group_id,
+                pending_confirmation=True
+            )
+            msg_level = messages.SUCCESS if created else messages.WARNING
+            msg = _('Your invitation to %s was sent!' % username )\
+                if created \
+                else _('You are already invited %s.' % username)
+        else:
+            msg_level = messages.WARNING
+            msg = _('%s is already in the group!' % username )
+    except ObjectDoesNotExist:
+        msg_level = messages.ERROR
+        msg = _('User %s not found!' % username)
+    messages.add_message(request, msg_level, msg)
+    return HttpResponseRedirect(reverse(
+        'group_chat',
+        kwargs={'group_id': group_id}
+    ))
+
+@login_required
+def group_invitations(request):
+    user_groups = Group.objects.filter(members__pk=request.user.pk)
+    pending_confirmation_groups = UserGroup.filter_pending(
+        user_groups,
+        request.user,
+        pending=True
+    )
+    context = {'group_invitations': pending_confirmation_groups}
+    return TemplateResponse(request, 'groups/invitations.html', context)
+
+@login_required
+def accept_invitation(request, group_id):
+    group = Group.objects.get(pk=group_id)
+    user_group = UserGroup.objects.get(user=request.user, group=group)
+    user_group.pending_confirmation = False
+    user_group.save()
+    msg_level = messages.SUCCESS
+    msg = _('Invitation accepted!')
+    messages.add_message(request, msg_level, msg)
+    return HttpResponseRedirect(reverse('group_invitations'))
