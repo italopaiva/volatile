@@ -114,6 +114,8 @@ class GroupView(View):
         form = self.form(data=request.POST, instance=group)
         if form.is_valid():
             form.save()
+            # Join user to group automatically
+            UserGroup.add_user_to_group(request.user, group.pk)
             msg_level = messages.SUCCESS
             msg = _('Your group was created!')
         else:
@@ -159,10 +161,7 @@ def delete_post(request, post_id):
 def join_group(request, group_id):
     """ Enrolls the current user to a given group """
     group = Group.objects.get(pk=group_id)
-    user_group, created = UserGroup.objects.get_or_create(
-        user=request.user,
-        group=group
-    )
+    user_group, created = UserGroup.add_user_to_group(request.user, group_id)
     msg_level = messages.SUCCESS if created else messages.WARNING
     msg = _('Congrats! You have joined the group %s.' % group.name)\
         if created \

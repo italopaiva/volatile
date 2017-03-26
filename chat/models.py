@@ -31,6 +31,11 @@ class UserGroup(models.Model):
     class Meta:
         unique_together = ('user', 'group')
 
+    @classmethod
+    def add_user_to_group(cls, user, group_id):
+        group = Group.objects.get(pk=group_id)
+        return cls.objects.get_or_create(user=user, group=group)
+
 
 class Post(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
